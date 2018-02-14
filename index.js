@@ -13,10 +13,6 @@ function time(s) {
     return new Date(s * 1e3).toISOString().slice(-13, -5);
 }
 
-console.log = function(string){
-    var logtime = Math.floor(new Date() / 1000);
-    process.stdout.write("\033[36;1;4m[ONZ " + time(logtime) + "]\033[0m" + "\033[37;0m " + "\033[33;1;4m[" + "ONZ" + "]\033[0m " + string + '\n \033[0m');
-}
 function ONZVanitygen(config) {
     console.log("ONZ Vanity Gen Initiated");
     if (typeof config !== 'object') {
@@ -86,6 +82,11 @@ ONZVanitygen.prototype.generateONZPair = function(passphrase) {
     }
 }
 
+ONZVanitygen.prototype.log = function(string){
+        var logtime = Math.floor(new Date() / 1000);
+        process.stdout.write("\033[36;1;4m[ONZ " + time(logtime) + "]\033[0m" + "\033[37;0m " + "\033[33;1;4m[" + "ONZ" + "]\033[0m " + string + '\n \033[0m'); 
+}
+
 ONZVanitygen.prototype.run = function(foundCallback, statusCallback) {
     if (typeof foundCallback !== 'function') {
         throw new Error('Found callback must be a function.');
@@ -108,7 +109,6 @@ ONZVanitygen.prototype.run = function(foundCallback, statusCallback) {
 
         if (singleStartTime - startTime > 1000 && singleStartTime - lastMessage >= this.config.messageInterval) {
             let time = parseInt((singleStartTime - startTime) / 1000);
-
             statusCallback({
                 count,
                 time,
@@ -138,5 +138,9 @@ ONZVanitygen.prototype.run = function(foundCallback, statusCallback) {
 
     return this;
 };
+
+console.log = function(string){
+    ONZVanitygen.prototype.log(string);
+}
 
 module.exports = ONZVanitygen;

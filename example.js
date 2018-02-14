@@ -14,24 +14,20 @@ const fs = require('fs');
 let onzAddGen = new ONZVanitygen({
     pattern: patterns,
     continue: true,
-    messageInterval: 5000,
+    messageInterval: 1000,
     debugMode: true
 });
 
-onzAddGen.run(function(data){
+onzAddGen.run((data) => {
     let txt = `
-    Pattern:    ${data.pattern}
-    Address:    ${data.address}
-    Passphrase: ${data.passphrase}
-    DebugMode: ${data.debugMode}
-    `;
-});
-
-
-fs.appendFileSync('out.txt', txt, function(error){
-    if(!error){
-        let txt = `\r\rCount: ${data.count} | Time: ${data.time} s. | Avg: ${data.avg} keys/s | Found: ${data.foundCount}`;
-        process.stdout.write(txt); // to back cursor to the start of the line (in console.log doesn't work)
-    }
-
+Pattern:    ${data.pattern}
+Address:    ${data.address}
+Passphrase: ${data.passphrase}
+`;
+    onzAddGen.log(txt);
+ 
+    fs.appendFileSync('found.txt', txt, (error) => {});
+}, (data) => {
+    let txt = `\r\rCount: ${data.count} | Time: ${data.time} s. | Avg: ${data.avg} keys/s | Found: ${data.foundCount}`;
+    process.stdout.write(txt); // to back cursor to the start of the line (in console.log doesn't work)
 });
