@@ -1,13 +1,24 @@
-'use strict'
-
-const bignum = require('bignum');
+/*
+    ONZ Vanity Address - Scottie
+    https://github.com/scottie/onz-vanity-gen
+*/
+//'use strict';
 const bip39 = require('bip39');
 const crypto = require('crypto');
-const sodium = require('sodium');
+const onz = require('onz-js');
 
 const noop = function() {};
 
-function LiskVanitygen(config) {
+function time(s) {
+    return new Date(s * 1e3).toISOString().slice(-13, -5);
+}
+
+console.log = function(string){
+    var logtime = Math.floor(new Date() / 1000);
+    process.stdout.write("\033[36;1;4m[ONZ " + time(logtime) + "]\033[0m" + "\033[37;0m " + "\033[33;1;4m[" + "ONZ" + "]\033[0m " + string + '\n \033[0m');
+}
+function ONZVanitygen(config) {
+    console.log("ONZ Vanity Gen Initiated");
     if (typeof config !== 'object') {
         throw new Error('Config must be an object.');
     }
@@ -19,20 +30,20 @@ function LiskVanitygen(config) {
     let newConfig = {};
     let tempPattern;
 
-    if (typeof config.pattern === 'number') {
-        tempPattern = [config.pattern];
-    } else if (config.pattern instanceof Array) {
-        tempPattern = config.pattern;
-    } else {
-        throw new Error('config.pattern must be array or number.');
-    }
+    //if (typeof config.pattern === 'number') {
+    tempPattern = [config.pattern];
+    //} else if (config.pattern instanceof Array) {
+    //    tempPattern = config.pattern;
+    //} else {
+    //    throw new Error('config.pattern must be array or number/letter.');
+    //}
 
-    tempPattern = tempPattern
-        .filter((a) => Number.isInteger(a))
-        .sort((a, b) => b - a);
+    //tempPattern = tempPattern
+    //    .filter((a) => Number.isInteger(a))
+    //    .sort((a, b) => b - a);
 
     if (!tempPattern.length) {
-        throw new Error('config.pattern must be array with at least one number.');
+        throw new Error('config.pattern must be array with at least one number or letter.');
     }
 
     newConfig.pattern = tempPattern;
@@ -42,34 +53,40 @@ function LiskVanitygen(config) {
     this.config = newConfig;
 }
 
-LiskVanitygen.prototype.generateLiskPair = function(passphrase) {
+ONZVanitygen.prototype.generateONZPair = function(passphrase) {
     if (!passphrase) {
         passphrase = bip39.generateMnemonic();
     }
 
-    const hash = crypto.createHash('sha256').update(passphrase, 'utf8').digest();
-    const kp2 = new sodium.Key.Sign.fromSeed(hash, 'base64');
-    const publicKey = kp2.publicKey.baseBuffer;
+ 
+    var ONZ = onz.api({testnet:true});
 
-    function getAddress(key) {
-        const hash = crypto.createHash('sha256').update(key).digest();
-
-        let temp = new Buffer(8);
-
-        for (let i = 0; i < 8; i++) {
-            temp[i] = hash[7 - i];
+    //console.log("Generating Keys: " + passphrase);
+    var keys = onz.crypto.getKeys(passphrase);
+    var address = onz.crypto.getAddress(keys.publicKey);
+    /*
+    function getAddress(publicKey) {
+        var publicKeyHash = crypto.createHash('sha256').update(publicKey, 'hex').digest();
+        var buffer = new Buffer(new RIPEMD160().update(publicKeyHash).digest('hex'));
+        var payload = new Buffer(21);
+        payload.writeUInt8(81, 0);
+        buffer.copy(payload, 1);
+        var addr = 'ON'+bs58check.encode(payload);
+        if(this.config.debugMode){
+            console.log(addr);
         }
-
-        return bignum.fromBuffer(temp).toString() + 'L';
+        
+        return addr;
     }
-
+   */
+  //console.log("Address: " + address);
     return {
         passphrase,
-        address: getAddress(publicKey),
+        address: address,//getAddress(publicKey),
     }
 }
 
-LiskVanitygen.prototype.run = function(foundCallback, statusCallback) {
+ONZVanitygen.prototype.run = function(foundCallback, statusCallback) {
     if (typeof foundCallback !== 'function') {
         throw new Error('Found callback must be a function.');
     }
@@ -86,7 +103,7 @@ LiskVanitygen.prototype.run = function(foundCallback, statusCallback) {
     let lastMessage = 0;
 
     do {
-        let generated = this.generateLiskPair();
+        let generated = this.generateONZPair();
         let singleStartTime = new Date().valueOf();
 
         if (singleStartTime - startTime > 1000 && singleStartTime - lastMessage >= this.config.messageInterval) {
@@ -122,4 +139,4 @@ LiskVanitygen.prototype.run = function(foundCallback, statusCallback) {
     return this;
 };
 
-module.exports = LiskVanitygen;
+module.exports = ONZVanitygen;

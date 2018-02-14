@@ -1,25 +1,35 @@
 {
-  "name": "node-lisk-vanitygen",
+  "name": "onz-vanity-gen",
   "version": "1.0.0",
-  "description": "LISK vanitygen",
+  "description": "ONZ Vanity Generator",
   "main": "index.js",
   "repository": {
-    "url": "git://github.com/rwilinski/node-lisk-vanitygen.git"
+    "url": "git://github.com/scottie/onz-vanity-gen.git"
   },
   "keywords": [
     "node",
+    "onz",
+    "altcoin",
+    "crypto",
+    "onzcoin",
+    "cryptocurrency",
     "lisk",
     "vanitygen",
     "bitcoin"
   ],
   "scripts": {
+    "example": "node example.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Radosław Wiliński",
+  "author": "Scott Lindh",
+  "original-author": "Radosław Wiliński",
   "license": "MIT",
   "dependencies": {
-    "bignum": "^0.12.5",
-    "bip39": "^2.4.0",
-    "sodium": "^2.0.1"
-  }
+    "onz-js": "git+https://github.com/OnzCoin/onz-js.git",
+    "bip39": "^2.4.0"
+  },
+  "bugs": {
+    "url": "https://github.com/scottie/onz-vanit-ygen/issues"
+  },
+  "homepage": "https://github.com/scottie//onz-vanity-gen#readme"
 }
